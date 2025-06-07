@@ -40,6 +40,10 @@
             padding: 8px;
             width: 20%;
         }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -60,13 +64,15 @@
 </table>
 
 <div class="add-form">
-    <input type="text" id="newItem" placeholder="Enter new item">
-    <button onclick="addItem()">Add</button>
+    <input type="text" id="newItem" placeholder="Enter new item" disabled>
+    <button onclick="addItem()" disabled>Add</button>
 </div>
 
 <script>
-    let items = [];
-    let nextId = 1;
+    let items = [
+        { id: 1, text: 'First todo item' },
+        { id: 2, text: 'Second todo item' }
+    ];
 
     function renderList() {
         const listBody = document.getElementById('listBody');
@@ -77,27 +83,23 @@
             row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${item.text}</td>
-                <td><button onclick="removeItem(${index})">Remove</button></td>
+                <td><button onclick="removeItem(${item.id})">×</button></td>
             `;
             listBody.appendChild(row);
         });
     }
 
-    function addItem() {
-        const newItemInput = document.getElementById('newItem');
-        const newItemText = newItemInput.value.trim();
-
-        if (newItemText) {
-            items.push({ id: nextId++, text: newItemText });
-            newItemInput.value = '';
-            renderList();
-        }
-    }
-
-    function removeItem(index) {
-        items.splice(index, 1);
+    function removeItem(id) {
+        items = items.filter(item => item.id !== id);
         renderList();
     }
+
+    function addItem() {
+        // Disabled in this branch
+    }
+
+    // Initial render
+    renderList();
 </script>
 
 </body>
