@@ -40,6 +40,15 @@
             padding: 8px;
             width: 20%;
         }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -60,13 +69,13 @@
 </table>
 
 <div class="add-form">
-    <input type="text" id="newItem" placeholder="Enter new item">
-    <button onclick="addItem()">Add</button>
+    <input type="text" id="newItem" placeholder="Enter new item" disabled>
+    <button onclick="addItem()" disabled>Add</button>
 </div>
 
 <script>
     let items = [];
-    let nextId = 1;
+    let editingId = null;
 
     function renderList() {
         const listBody = document.getElementById('listBody');
@@ -74,30 +83,65 @@
 
         items.forEach((item, index) => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${item.text}</td>
-                <td><button onclick="removeItem(${index})">Remove</button></td>
-            `;
+            if (editingId === item.id) {
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><input type="text" class="edit-input" id="editInput-${item.id}" value="${item.text}"></td>
+                    <td>
+                        <button onclick="saveEdit(${item.id})">Save</button>
+                        <button onclick="cancelEdit()">Cancel</button>
+                    </td>
+                `;
+            } else {
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.text}</td>
+                    <td>
+                        <button onclick="startEdit(${item.id})">Edit</button>
+                        <button onclick="removeItem(${index})" disabled>Remove</button>
+                    </td>
+                `;
+            }
             listBody.appendChild(row);
         });
     }
 
-    function addItem() {
-        const newItemInput = document.getElementById('newItem');
-        const newItemText = newItemInput.value.trim();
+    function startEdit(id) {
+        editingId = id;
+        renderList();
+    }
 
-        if (newItemText) {
-            items.push({ id: nextId++, text: newItemText });
-            newItemInput.value = '';
-            renderList();
+    function saveEdit(id) {
+        const newText = document.getElementById(`editInput-${id}`).value.trim();
+        if (newText) {
+            const itemIndex = items.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                items[itemIndex].text = newText;
+            }
         }
+        editingId = null;
+        renderList();
+    }
+
+    function cancelEdit() {
+        editingId = null;
+        renderList();
+    }
+
+    function addItem() {
+        // Disabled in this branch
     }
 
     function removeItem(index) {
-        items.splice(index, 1);
-        renderList();
+        // Disabled in this branch
     }
+
+    // Initialize with sample data
+    items = [
+        { id: 1, text: 'First todo item' },
+        { id: 2, text: 'Second todo item' }
+    ];
+    renderList();
 </script>
 
 </body>
